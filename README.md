@@ -1,4 +1,5 @@
 # 3D Printer Anomaly Detected system
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Justin900429/3d-printer-anomaly-detect/blob/main/Meta_3D_printer.ipynb)
 
 ## Introduction
 This project is to design a system for detecting the anomalies during the printing process. We collect our own dataset with a RPI and a Ender 3 pro.
@@ -25,5 +26,5 @@ $ python main.py
 ```
 
 ## Dataset
-We upload our data to [kaggle](https://www.kaggle.com/datasets/justin900429/3d-printer-defected-dataset)
+We upload our data to [kaggle](https://www.kaggle.com/datasets/justin900429/3d-printer-defected-dataset).
 
