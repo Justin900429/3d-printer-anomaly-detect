@@ -7,3 +7,5 @@ requests==2.26.0
 timm==0.5.4
 torch==1.11.0
 torchvision==0.12.0
+pyqt5==5.15.4
+python-dotenv==0.20.0
