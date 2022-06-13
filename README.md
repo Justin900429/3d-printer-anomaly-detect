@@ -22,7 +22,7 @@ $ python send_image.py
 
 ### Backend
 ```
-$ python main.py
+$ python backend/main.py
 ```
 
 ## Dataset
