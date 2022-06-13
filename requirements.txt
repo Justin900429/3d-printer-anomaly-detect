@@ -1,5 +1,9 @@
 imutils==0.5.4
-opencv_python_headless==4.2.0.34
-numpy==1.20.1
-requests==2.24.0
-joblib==0.16.0
+joblib==1.1.0
+numpy==1.21.2
+onnxruntime==1.11.1
+opencv_python==4.5.3.56
+requests==2.26.0
+timm==0.5.4
+torch==1.11.0
+torchvision==0.12.0
