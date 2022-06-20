@@ -30,5 +30,6 @@ model.load_state_dict(rewrite_weight("resnet.pt"))
 test_tensor = torch.randn(1, 3, 352, 352)
 
 start = time.time()
-_ = model(test_tensor)
-print(time.time() - start)
+for _ in range(10):
+    _ = model(test_tensor)
+print((time.time() - start) / 10)

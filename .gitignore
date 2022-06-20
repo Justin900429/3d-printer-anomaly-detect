@@ -53,3 +53,5 @@ wheels/
 **/*.onnx
 **/*.pt
 new_data
+
+**/service_account.json
