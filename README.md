@@ -1,5 +1,6 @@
 # 3D Printer Anomaly Detected system
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Justin900429/3d-printer-anomaly-detect/blob/main/Meta_3D_printer.ipynb)
+Meta Learning: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Justin900429/3d-printer-anomaly-detect/blob/main/Meta_3D_printer.ipynb) \
+Quantization Aware Training: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Justin900429/3d-printer-anomaly-detect/blob/main/quantize.ipynb)
 
 ## Introduction
 This project is to design a system for detecting the anomalies during the printing process. We collect our own dataset with a RPI and a Ender 3 pro.
