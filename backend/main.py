@@ -1,4 +1,10 @@
 import sys
+
+import firebase_admin
+import firebase_admin
+from PyQt5.QtCore import QCoreApplication
+from firebase_admin import firestore, credentials
+
 from PyQt5 import QtWidgets
 
 from octoclient import OctoClient
@@ -11,21 +17,21 @@ class VLine(QtWidgets.QFrame):
     """VLine taken from
     https://stackoverflow.com/a/57944421/12751554
     """
-
     def __init__(self):
         super(VLine, self).__init__()
         self.setFrameShape(self.VLine | self.Sunken)
 
 
 class TabWidget(QtWidgets.QTabWidget):
-    def __init__(self, octo, parent=None):
+    def __init__(self, octo, firestore_client, parent=None):
         super(TabWidget, self).__init__(parent)
         self.octo = octo
+        self.firestore_client = firestore_client
 
-    def init_ui(self):
+    def init_ui(self, machine_id):
         self.state_tab = StateTab(self, self.octo)
         self.file_tab = FileTab(self, self.octo)
-        self.monitor_tab = MonitorTab(self, self.octo)
+        self.monitor_tab = MonitorTab(self, self.octo, self.firestore_client, machine_id)
         self.material_tab = MaterialTab(self)
 
         self.addTab(self.state_tab, "Status")
@@ -51,10 +57,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        # Set up firestore authorization for monitor tab
+        cred = credentials.Certificate("service_account.json")
+        firebase_admin.initialize_app(cred)
+        firestore_client = firestore.client()
+
         octo = OctoClient(use_cap=False)
-        self.login_window = Login()
-        self.main_widget = TabWidget(octo, parent=self)
-        self.user_id = None
+        self.login_window = Login(firestore_client, parent=self)
+        self.main_widget = TabWidget(octo, firestore_client, parent=self)
+        self.machine_id = None
 
         self.connected = QtWidgets.QLabel()
         self.connected.setStyleSheet("border: none")
@@ -85,6 +96,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.check_thread = True
         if self.login_window.exec_() == QtWidgets.QDialog.Accepted:
+            self.machine_id = self.login_window.machine_id
             windows = QtWidgets.QMessageBox()
             windows.setIcon(QtWidgets.QMessageBox.Information)
             windows.setText("Loading...")
@@ -93,15 +105,14 @@ class MainWindow(QtWidgets.QMainWindow):
             windows.show()
             QtWidgets.QApplication.processEvents()
 
-            self.main_widget.init_ui()
+            self.main_widget.init_ui(self.machine_id)
             self.init_ui()
 
             windows.done(0)
             self.check_connected = CheckConnection(self, octo, self.connected)
             self.check_connected.start()
         else:
-            self.login_window.close()
-            self.close()
+            sys.exit(0)
 
     def init_ui(self):
         self.setCentralWidget(self.main_widget)

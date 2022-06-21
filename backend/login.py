@@ -4,9 +4,18 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 
 
+def check_in_db(machine_id, docs):
+    for data in docs:
+        if machine_id == data.to_dict()["id"]:
+            return True
+
+
 class Login(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, firestore_client, parent=None):
         super(Login, self).__init__(parent)
+
+        self.firestore_check_machine = firestore_client.collection(u"machines")
+
         self.setStyleSheet(
             "background-color: white;"
         )
@@ -84,6 +93,38 @@ class Login(QtWidgets.QDialog):
         pwd_h_layout.addWidget(self.pwd_label, 1, Qt.AlignLeft)
         pwd_h_layout.addWidget(self.pwd_edit, 2, Qt.AlignRight)
 
+        # Machine id
+        self.machine_label = QtWidgets.QLabel("Machine ID:", self)
+        self.machine_label.setStyleSheet(
+            "font-size: 20pt;"
+        )
+        self.machine_edit = QtWidgets.QLineEdit(self)
+        self.machine_edit.setAttribute(Qt.WA_MacShowFocusRect, 0)
+        self.machine_edit.textChanged.connect(self.machine_text_change)
+        self.machine_edit.setClearButtonEnabled(True)
+        self.machine_edit.setPlaceholderText("Input your machine ID")
+        self.machine_edit.setStyleSheet(
+            """
+            QLineEdit {
+                padding: 5px;
+                border: 0.5px solid gray;
+                border-radius: 5px;
+                width: 180px;
+            }
+            QLineEdit[empty = "0"] {
+                border: 1px solid red
+            }
+            QLineEdit[empty = "1"] {
+            }
+            QLineEdit::focus {
+               border: 1.5px solid black;
+            }
+            """
+        )
+        machine_h_layout = QtWidgets.QHBoxLayout()
+        machine_h_layout.addWidget(self.machine_label, 1, Qt.AlignLeft)
+        machine_h_layout.addWidget(self.machine_edit, 2, Qt.AlignRight)
+
         # Login button
         self.buttonLogin = QtWidgets.QPushButton('Login', self)
         shadow = QGraphicsDropShadowEffect()
@@ -109,6 +150,7 @@ class Login(QtWidgets.QDialog):
         layout.addWidget(self.page_name)
         layout.addLayout(acc_h_layout)
         layout.addLayout(pwd_h_layout)
+        layout.addLayout(machine_h_layout)
         layout.addSpacing(25)
         layout.addWidget(self.buttonLogin)
 
@@ -128,10 +170,12 @@ class Login(QtWidgets.QDialog):
             account = self.acc_edit.text()
             password = os.getenv(account)
 
-            if (password is not None) and (password == self.pwd_edit.text()):
+            if (password is not None) and (password == self.pwd_edit.text()) and \
+                    check_in_db(self.machine_edit.text(), self.firestore_check_machine.stream()):
                 self.get_id()
                 self.acc_edit.clear()
                 self.pwd_edit.clear()
+                self.machine_edit.clear()
                 self.accept()
             else:
                 QtWidgets.QMessageBox.warning(self, "Error", 'Bad user or password')
@@ -150,8 +194,15 @@ class Login(QtWidgets.QDialog):
             self.pwd_edit.setProperty("empty", "1")
         self.pwd_edit.style().polish(self.pwd_edit)
 
+    def machine_text_change(self, text):
+        if text.strip() == "":
+            self.machine_edit.setProperty("empty", "0")
+        else:
+            self.machine_edit.setProperty("empty", "1")
+        self.machine_edit.style().polish(self.machine_edit)
+
     def closeEvent(self, event):
         return self.reject()
 
     def get_id(self):
-        self.user_id = self.acc_edit.text()
+        self.machine_id = self.machine_edit.text()

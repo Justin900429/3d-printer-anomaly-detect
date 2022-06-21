@@ -36,10 +36,12 @@ class VideoWorkerThread(QThread):
                 img_string = self.recv_all(self.capture, int(length))
                 frame = np.fromstring(img_string, dtype="uint8")
                 frame = cv2.imdecode(frame, 1)
-            except (socket.timeout, BlockingIOError) as e:
-                self.parent.thread_is_running = False
+            except (socket.timeout, BlockingIOError, ConnectionResetError, TypeError) as e:
                 self.parent.start_button.setEnabled(True)
-                self.parent.video_display_label.setText(str(e))
+                self.parent.video_display_label.setText("Connection is closed or crashed."
+                                                        " Please check the server status")
+                self.parent.predict_text.setText("-")
+                self.parent.thread_is_running = False
                 break
 
             frame = imutils.resize(frame, width=640)

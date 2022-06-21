@@ -50,6 +50,10 @@ class FileTab(QtWidgets.QWidget):
         self.upload_btn.setText("Upload file")
         self.upload_btn.clicked.connect(self.upload_file)
 
+        self.search_edit_text = QtWidgets.QLineEdit()
+        self.search_edit_text.setPlaceholderText("Search file")
+        self.search_edit_text.textChanged.connect(self.search_file)
+
         self.list_view = QtWidgets.QListWidget()
         self.list_view.setStyleSheet(
             """
@@ -68,6 +72,7 @@ class FileTab(QtWidgets.QWidget):
         side_h_box.addWidget(self.upload_btn)
         side_v_box = QtWidgets.QVBoxLayout()
         side_v_box.addLayout(side_h_box)
+        side_v_box.addWidget(self.search_edit_text)
         side_v_box.addWidget(self.list_view)
 
         self.setLayout(side_v_box)
@@ -83,10 +88,10 @@ class FileTab(QtWidgets.QWidget):
         return f"{base}{size_name[level]}"
 
     def load_file_list(self):
-        file_info_list = self.oct_client.get_file_list()
+        self.file_info_list = self.oct_client.get_file_list()
 
-        if len(file_info_list["files"]) > 0:
-            for file_info in file_info_list["files"]:
+        if len(self.file_info_list["files"]) > 0:
+            for file_info in self.file_info_list["files"]:
                 custom_widget = FileItem(self)
                 custom_widget_item = QtWidgets.QListWidgetItem(self.list_view)
                 custom_widget_item.setSizeHint(QSize(100, 100))
@@ -96,6 +101,24 @@ class FileTab(QtWidgets.QWidget):
                 self.list_view.addItem(custom_widget_item)
                 self.list_view.setItemWidget(custom_widget_item, custom_widget)
 
+    def search_file(self, value):
+        if value == "":
+            self.reload_list()
+        else:
+            self.list_view.clear()
+
+            if len(self.file_info_list["files"]) > 0:
+                for file_info in self.file_info_list["files"]:
+                    file_name = f"{file_info['origin']}/{file_info['name']}"
+                    if value in file_name:
+                        custom_widget = FileItem(self)
+                        custom_widget_item = QtWidgets.QListWidgetItem(self.list_view)
+                        custom_widget_item.setSizeHint(QSize(100, 100))
+                        custom_widget.set_file_name(file_name)
+                        custom_widget.set_file_size(self.readable_size_format(file_info["size"]))
+                        self.list_view.addItem(custom_widget_item)
+                        self.list_view.setItemWidget(custom_widget_item, custom_widget)
+
     def reload_list(self):
         self.list_view.clear()
         self.load_file_list()
@@ -103,14 +126,16 @@ class FileTab(QtWidgets.QWidget):
     def upload_file(self):
         filename = QtWidgets.QFileDialog.getOpenFileName(
             self, "Open File", str(Path.home()), filter="Gcode (*.gcode)")
-        res = self.oct_client.upload_file(filename[0]).json()
 
-        if res["done"]:
-            QMessageBox.information(
-                self, "Upload Result", "success",
-                QMessageBox.Ok)
-            self.reload_list()
-        else:
-            QMessageBox.critical(
-                self, "Upload Result", "fail",
-                QMessageBox.Ok)
+        if filename[0] != "":
+            res = self.oct_client.upload_file(filename[0]).json()
+
+            if res["done"]:
+                QMessageBox.information(
+                    self, "Upload Result", "success",
+                    QMessageBox.Ok)
+                self.reload_list()
+            else:
+                QMessageBox.critical(
+                    self, "Upload Result", "fail",
+                    QMessageBox.Ok)

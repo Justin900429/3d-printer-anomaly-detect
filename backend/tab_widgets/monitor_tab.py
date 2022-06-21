@@ -32,16 +32,18 @@ def reload_weight(weight_path):
 
 
 class MonitorTab(QtWidgets.QWidget):
-    def __init__(self, parent, client, use_onnx=True):
+    def __init__(self, parent, client, firestore_client, machine_id, use_onnx=True):
         super(MonitorTab, self).__init__(parent)
 
         self.client = client
+        self.firestore_client = firestore_client
+        self.machine_id = machine_id
         self.use_onnx = use_onnx
         self.img_queue = queue.Queue(maxsize=200)
 
         # ================ Model ===================
         self.transform = transforms.Compose([
-            transforms.Lambda(lambda x: cv2.cvtColor(x, cv2.COLOR_RGB2BGR)),
+            # transforms.Lambda(lambda x: cv2.cvtColor(x, cv2.COLOR_RGB2BGR)),
             transforms.ToTensor(),
             transforms.Resize((400, 400)),
             transforms.CenterCrop((352, 352)),
@@ -182,9 +184,13 @@ class MonitorTab(QtWidgets.QWidget):
             if self.use_onnx:
                 outputs = self.model.run(None, {"input": self.transform(frame)})
                 self.predict_text.setText(index_to_cls[int(outputs[0][0][1] > outputs[0][0][0])])
+                anomaly = int(outputs[0][0][1] > outputs[0][0][0])
             else:
                 outputs = self.model(self.transform(frame))
                 self.predict_text.setText(index_to_cls[outputs.argmax(dim=-1).item()])
+                anomaly = bool(outputs.argmax(dim=-1).item())
+            if anomaly:
+                self.firestore_client.collection(u"anomaly").document(self.machine_id).set({"error": True})
         else:
             self.predict_text.setText("-")
 
