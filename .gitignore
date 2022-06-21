@@ -55,5 +55,4 @@ wheels/
 new_data
 
 **/service_account.json
-**/config.ini
 linebot/test.py
