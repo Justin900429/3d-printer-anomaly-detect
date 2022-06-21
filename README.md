@@ -2,9 +2,9 @@
   3D-Printer Anomaly Detection
 </h1>
 
-<center>
+<p align="center">
   <img src="assets/cover.jpg" width=60% alt="cover image"/>
-</center>
+<p>
 
 ## Introduction
 
