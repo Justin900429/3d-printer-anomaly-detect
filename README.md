@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img src="assets/cover.jpg" width=60% alt="cover image"/>
+  <a href="https://www.kaggle.com/datasets/justin900429/3d-printer-defected-dataset"><img src="assets/cover.jpg" width=60% alt="cover image"/></a>
 <p>
 
 ## Introduction
