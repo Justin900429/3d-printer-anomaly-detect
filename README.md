@@ -13,9 +13,9 @@ This project is to design a system for detecting the anomalies during the printi
 ## Installation
 ```bash
 # Download the weights
-$ wget -O weights/resnet.onnx https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1-alpha/resnet.onnx
-$ wget -O weights/resnet.pt https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1-alpha/resnet.pt
-$ wget -O weights/resnet.pt https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1-alpha/quantized.pt
+$ wget -O weights/resnet.onnx https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1/resnet.onnx
+$ wget -O weights/resnet.pt https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1/resnet.pt
+$ wget -O weights/resnet.pt https://github.com/Justin900429/3d-printer-anomaly-detect/releases/download/v0.0.1/quantized.pt
 
 
 # Install the python package
